@@ -1,0 +1,664 @@
+ANSWER 1(A)
+
+// ClassA with private variables and parameterized constructors
+class ClassA {
+    private String varA;
+
+    // Parameterized constructor
+    public ClassA(String varA) {
+        this.varA = varA;
+    }
+
+    // Copy constructor
+    public ClassA(ClassA other) {
+        this.varA = other.varA;
+    }
+
+    // Getter and Setter for varA
+    public String getVarA() {
+        return varA;
+    }
+
+    public void setVarA(String varA) {
+        this.varA = varA;
+    }
+}
+
+// ClassB extending ClassA
+class ClassB extends ClassA {
+    protected String varB; // Protected variable
+
+    // Private constructor to prevent object creation
+    private ClassB(String varA, String varB) {
+        super(varA);
+        this.varB = varB;
+    }
+
+    // Parameterized constructor calling ClassA constructor
+    public ClassB(String varB) {
+        super("DefaultA"); // Default value for ClassA
+        this.varB = varB;
+    }
+
+    // Copy constructor
+    public ClassB(ClassB other) {
+        super(other); // Call ClassA's copy constructor
+        this.varB = other.varB;
+    }
+}
+
+// ClassC extending ClassB
+class ClassC extends ClassB {
+    public String varC; // Public variable
+
+    // Parameterized constructor calling ClassB's constructor
+    public ClassC(String varB, String varC) {
+        super(varB);
+        this.varC = varC;
+    }
+
+    // Copy constructor
+    public ClassC(ClassC other) {
+        super(other); // Call ClassB's copy constructor
+        this.varC = other.varC;
+    }
+
+    // Synchronized method to display all instance variables
+    public synchronized void displayVariables() {
+        System.out.println("ClassA variable: " + getVarA());
+        System.out.println("ClassB variable: " + varB);
+        System.out.println("ClassC variable: " + varC);
+    }
+}
+
+// Main Class
+public class Main {
+    public static void main(String[] args) {
+        // Creating an instance of ClassC
+        ClassC objC = new ClassC("ValueB", "ValueC");
+
+        // Copying the object using the copy constructor
+        ClassC copiedObjC = new ClassC(objC);
+
+        // Displaying variables using the synchronized method
+        objC.displayVariables();
+        copiedObjC.displayVariables();
+    }
+}
+
+
+ANSWER 1(B)
+
+// Main Class with Static and Inner Nested Classes
+public class Main {
+
+    // Static variable
+    private static int staticVar = 10;
+
+    // Instance variable
+    private int instanceVar = 20;
+
+    // Overriding the toString() method from Object class
+    @Override
+    public String toString() {
+        return "OuterClass: staticVar=" + staticVar + ", instanceVar=" + instanceVar;
+    }
+
+    // Static Nested Class
+    public static class StaticNestedClass {
+        // Static block
+        static {
+            System.out.println("Static block in StaticNestedClass executed");
+        }
+
+        // Instance block
+        {
+            System.out.println("Instance block in StaticNestedClass executed");
+        }
+
+        // Constructor
+        public StaticNestedClass() {
+            System.out.println("Constructor in StaticNestedClass executed");
+        }
+
+        public void accessVariables(Main outer) {
+            // Accessing static variable directly
+            System.out.println("Accessing staticVar: " + staticVar);
+
+            // Accessing instance variable using Main.this
+            System.out.println("Accessing instanceVar via OuterClass.this: " + outer.instanceVar);
+        }
+    }
+
+    // Final Nested Inner Class
+    public final class FinalNestedClass {
+        // Final variable
+        private final String finalVar = "Immutable Value";
+
+        // Final method
+        public final void showDetails() {
+            System.out.println("Final Variable: " + finalVar);
+        }
+    }
+
+    // Static method to demonstrate restricted access
+    public static void staticMethod() {
+        System.out.println("Static Method: Accessing static variable staticVar = " + staticVar);
+
+        // Cannot access instance variables directly
+        // Uncommenting the following line will cause an error
+        // System.out.println("Instance Variable: " + instanceVar);
+    }
+
+    // Synchronized block to demonstrate thread-safe access to shared static variable
+    public void incrementStaticVarSafely() {
+        synchronized (Main.class) {
+            staticVar++;
+            System.out.println("Thread-safe increment of staticVar: " + staticVar);
+        }
+    }
+
+    // Final Utility Class
+    public static final class UtilityClass {
+        // Static utility method
+        public static void utilityMethod() {
+            System.out.println("Utility Method Executed.");
+        }
+    }
+
+    // Main Method to Demonstrate
+    public static void main(String[] args) {
+        Main outer = new Main();
+
+        // Using the static nested class
+        StaticNestedClass staticNested = new StaticNestedClass();
+        staticNested.accessVariables(outer);
+
+        // Using the final inner class
+        FinalNestedClass finalInner = outer.new FinalNestedClass();
+        finalInner.showDetails();
+
+        // Using static method
+        staticMethod();
+
+        // Demonstrating synchronized block
+        outer.incrementStaticVarSafely();
+
+        // Using final utility class
+        UtilityClass.utilityMethod();
+    }
+}
+
+
+ANSWER 2(A)
+
+import java.util.*;
+
+// Custom Exception for Unavailable Items
+class ItemNotAvailableException extends Exception {
+    public ItemNotAvailableException(String message) {
+        super(message);
+    }
+}
+
+// Abstract Class LibraryItem
+abstract class LibraryItem {
+    private String title;
+    private String itemID;
+    private boolean isAvailable;
+
+    // Constructor
+    public LibraryItem(String title, String itemID) {
+        this.title = title;
+        this.itemID = itemID;
+        this.isAvailable = true;
+    }
+
+    // Getters
+    public String getTitle() {
+        return title;
+    }
+
+    public String getItemID() {
+        return itemID;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    // Setters
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
+
+    // Abstract methods
+    public abstract void borrow() throws ItemNotAvailableException;
+
+    public abstract void returnItem();
+}
+
+// Concrete Class Book
+class Book extends LibraryItem {
+    private String author;
+    private String genre;
+
+    public Book(String title, String itemID, String author, String genre) {
+        super(title, itemID);
+        this.author = author;
+        this.genre = genre;
+    }
+
+    @Override
+    public void borrow() throws ItemNotAvailableException {
+        if (!isAvailable()) {
+            throw new ItemNotAvailableException("Book '" + getTitle() + "' is not available.");
+        }
+        setAvailable(false);
+        System.out.println("Borrowed Book: " + getTitle());
+    }
+
+    @Override
+    public void returnItem() {
+        setAvailable(true);
+        System.out.println("Returned Book: " + getTitle());
+    }
+}
+
+// Concrete Class DVD
+class DVD extends LibraryItem {
+    private String director;
+    private int duration;
+
+    public DVD(String title, String itemID, String director, int duration) {
+        super(title, itemID);
+        this.director = director;
+        this.duration = duration;
+    }
+
+    @Override
+    public void borrow() throws ItemNotAvailableException {
+        if (!isAvailable()) {
+            throw new ItemNotAvailableException("DVD '" + getTitle() + "' is not available.");
+        }
+        setAvailable(false);
+        System.out.println("Borrowed DVD: " + getTitle());
+    }
+
+    @Override
+    public void returnItem() {
+        setAvailable(true);
+        System.out.println("Returned DVD: " + getTitle());
+    }
+}
+
+// Library Class
+class Library {
+    private List<LibraryItem> items;
+
+    public Library() {
+        items = new ArrayList<>();
+    }
+
+    // Add Item to Library
+    public void addItem(LibraryItem item) {
+        items.add(item);
+    }
+
+    // Search by Title
+    public LibraryItem search(String title) {
+        for (LibraryItem item : items) {
+            if (item.getTitle().equalsIgnoreCase(title)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    // Search by ID
+    public LibraryItem searchByID(String itemID) {
+        for (LibraryItem item : items) {
+            if (item.getItemID().equalsIgnoreCase(itemID)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    // Display Items by Type
+    public void displayItems() {
+        System.out.println("Books:");
+        for (LibraryItem item : items) {
+            if (item instanceof Book) {
+                System.out.println("  - " + item.getTitle());
+            }
+        }
+
+        System.out.println("DVDs:");
+        for (LibraryItem item : items) {
+            if (item instanceof DVD) {
+                System.out.println("  - " + item.getTitle());
+            }
+        }
+    }
+}
+
+// Main Class
+public class Main {
+    public static void main(String[] args) {
+        Library library = new Library();
+
+        // Add items to the library
+        library.addItem(new Book("The Great Gatsby", "B001", "F. Scott Fitzgerald", "Fiction"));
+        library.addItem(new DVD("Inception", "D001", "Christopher Nolan", 148));
+
+        // Search and Borrow an Item
+        try {
+            LibraryItem item = library.search("The Great Gatsby");
+            if (item != null) {
+                item.borrow();
+            } else {
+                System.out.println("Item not found.");
+            }
+        } catch (ItemNotAvailableException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("Borrow operation attempted.");
+        }
+
+        // Display All Items
+        library.displayItems();
+    }
+}
+
+
+
+
+ANSWER 2(B)
+
+
+import java.io.*;
+
+// Custom Exception for Invalid Compression Format
+class InvalidCompressionFormatException extends Exception {
+    public InvalidCompressionFormatException(String message) {
+        super(message);
+    }
+}
+
+public class Main {
+
+    // Compress a text file using Run-Length Encoding (RLE)
+    public static void compressTextFile(String inputFile, String outputFile) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String compressedLine = compressLine(line);
+                writer.write(compressedLine);
+                writer.newLine();
+            }
+            System.out.println("Compression completed. Output file: " + outputFile);
+
+        } catch (IOException e) {
+            System.out.println("Error during compression: " + e.getMessage());
+        } finally {
+            System.out.println("Compression operation finished.");
+        }
+    }
+
+    // Decompress a text file
+    public static void decompressTextFile(String inputFile, String outputFile) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String decompressedLine = decompressLine(line);
+                writer.write(decompressedLine);
+                writer.newLine();
+            }
+            System.out.println("Decompression completed. Output file: " + outputFile);
+
+        } catch (InvalidCompressionFormatException e) {
+            System.out.println("Decompression failed: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Error during decompression: " + e.getMessage());
+        } finally {
+            System.out.println("Decompression operation finished.");
+        }
+    }
+
+    // Compress a single line using RLE
+    private static String compressLine(String line) {
+        StringBuilder compressed = new StringBuilder();
+        int count = 1;
+
+        for (int i = 1; i <= line.length(); i++) {
+            if (i < line.length() && line.charAt(i) == line.charAt(i - 1)) {
+                count++;
+            } else {
+                compressed.append(line.charAt(i - 1)).append(count);
+                count = 1;
+            }
+        }
+        return compressed.toString();
+    }
+
+    // Decompress a single line using RLE
+    private static String decompressLine(String line) throws InvalidCompressionFormatException {
+        StringBuilder decompressed = new StringBuilder();
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            int count = 0;
+
+            // Check for digits following the character
+            while (i + 1 < line.length() && Character.isDigit(line.charAt(i + 1))) {
+                count = count * 10 + (line.charAt(++i) - '0');
+            }
+
+            if (count == 0) {
+                throw new InvalidCompressionFormatException("Invalid format in compressed line: " + line);
+            }
+
+            decompressed.append(String.valueOf(c).repeat(count));
+        }
+        return decompressed.toString();
+    }
+
+    public static void main(String[] args) {
+        String inputFile = "input.txt";         // Original file
+        String compressedFile = "compressed.txt"; // Compressed file
+        String decompressedFile = "decompressed.txt"; // Decompressed file
+
+        // Simulate input file creation for testing
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(inputFile))) {
+            writer.write("aaaabbbcccdde");
+        } catch (IOException e) {
+            System.out.println("Error creating input file: " + e.getMessage());
+        }
+
+        // Perform compression
+        compressTextFile(inputFile, compressedFile);
+
+        // Perform decompression
+        decompressTextFile(compressedFile, decompressedFile);
+    }
+}
+
+
+
+
+ANSWER 3(A)
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+
+public class Main {
+
+    // Resources
+    private static final Object Resource1 = new Object();
+    private static final Object Resource2 = new Object();
+
+    public static void main(String[] args) {
+        // Thread 1 locks Resource1 first
+        Thread thread1 = new Thread(() -> {
+            synchronized (Resource1) {
+                System.out.println("Thread 1: Locked Resource1");
+
+                // Simulate some work
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+
+                System.out.println("Thread 1: Trying to lock Resource2");
+                synchronized (Resource2) {
+                    System.out.println("Thread 1: Locked Resource2");
+                }
+            }
+        });
+
+        // Thread 2 locks Resource2 first
+        Thread thread2 = new Thread(() -> {
+            synchronized (Resource2) {
+                System.out.println("Thread 2: Locked Resource2");
+
+                // Simulate some work
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+
+                System.out.println("Thread 2: Trying to lock Resource1");
+                synchronized (Resource1) {
+                    System.out.println("Thread 2: Locked Resource1");
+                }
+            }
+        });
+
+        // Start threads
+        thread1.start();
+        thread2.start();
+
+        // Start deadlock detection
+        detectDeadlock();
+    }
+
+    // Detect and handle deadlocks
+    private static void detectDeadlock() {
+        Thread monitor = new Thread(() -> {
+            ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+            while (true) {
+                long[] threadIds = threadMXBean.findDeadlockedThreads();
+
+                if (threadIds != null) {
+                    ThreadInfo[] threadInfos = threadMXBean.getThreadInfo(threadIds);
+                    System.err.println("Deadlock detected!");
+                    for (ThreadInfo threadInfo : threadInfos) {
+                        System.err.println("Thread involved: " + threadInfo.getThreadName());
+                    }
+                    System.exit(1); // Exit the program gracefully
+                }
+
+                try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+            }
+        });
+        monitor.setDaemon(true); // Make the monitor thread a daemon thread
+        monitor.start();
+    }
+}
+
+
+ANSWER 3(B)
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+public class Main {
+
+    public static void main(String[] args) {
+        // Demonstrate the issue with a standard ArrayList
+        ArrayList<Integer> arrayList = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            arrayList.add(i);
+        }
+
+        // Thread 1: Iterates over the ArrayList
+        Thread thread1 = new Thread(() -> {
+            try {
+                System.out.println("Thread 1: Iterating through ArrayList...");
+                for (Integer num : arrayList) {
+                    System.out.println("Thread 1: Read " + num);
+                    Thread.sleep(50); // Simulate processing time
+                }
+            } catch (Exception e) {
+                System.err.println("Exception in Thread 1: " + e);
+            }
+        });
+
+        // Thread 2: Adds elements to the ArrayList
+        Thread thread2 = new Thread(() -> {
+            try {
+                Thread.sleep(100); // Delay to allow iteration to start
+                System.out.println("Thread 2: Adding elements to ArrayList...");
+                arrayList.add(6);
+                arrayList.add(7);
+            } catch (Exception e) {
+                System.err.println("Exception in Thread 2: " + e);
+            }
+        });
+
+        thread1.start();
+        thread2.start();
+
+        // Wait for threads to finish
+        try {
+            thread1.join();
+            thread2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Resolving the issue using CopyOnWriteArrayList
+        System.out.println("\n--- Resolving the issue using CopyOnWriteArrayList ---");
+        CopyOnWriteArrayList<Integer> safeList = new CopyOnWriteArrayList<>(arrayList);
+
+        // Thread 3: Iterates over the CopyOnWriteArrayList
+        Thread thread3 = new Thread(() -> {
+            System.out.println("Thread 3: Iterating through CopyOnWriteArrayList...");
+            for (Integer num : safeList) {
+                System.out.println("Thread 3: Read " + num);
+                try {
+                    Thread.sleep(50); // Simulate processing time
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        // Thread 4: Adds elements to the CopyOnWriteArrayList
+        Thread thread4 = new Thread(() -> {
+            try {
+                Thread.sleep(100); // Delay to allow iteration to start
+                System.out.println("Thread 4: Adding elements to CopyOnWriteArrayList...");
+                safeList.add(8);
+                safeList.add(9);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        thread3.start();
+        thread4.start();
+
+        // Wait for threads to finish
+        try {
+            thread3.join();
+            thread4.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Final Safe List: " + safeList);
+    }
+}
+
+
